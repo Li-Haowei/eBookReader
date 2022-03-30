@@ -2,6 +2,7 @@ package com.example.ebookreader;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class MainActivity extends AppCompatActivity {
     private String library = "惊悚乐园.txt";
@@ -36,7 +38,11 @@ public class MainActivity extends AppCompatActivity {
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.setLayoutParams(linearParams);
         SL.addView(linearLayout);
-
+        try {
+            readFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         btnNext.setOnClickListener(view -> {
             TextView tv = new TextView(MainActivity.this);
             tv.setLayoutParams(params1);
@@ -51,20 +57,30 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+    private void called(){
+        //this is for debug purpose
+        TextView tv1 = new TextView(MainActivity.this);
+        tv1.setLayoutParams(params1);
+        tv1.setText("functioncalled");
+        linearLayout.addView(tv1);
+    }
     private void readFile() throws IOException {
-        BufferedReader reader;
+        BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new FileReader(getAssets().open(library).toString()));
-            String line = reader.readLine();
-            while(line!=null){
-                TextView tv = new TextView(this);
-                tv.setText(line);
-                line = reader.readLine();
+            reader = new BufferedReader(new InputStreamReader(getAssets().open(library)));
+            String mline;
+            while((mline = reader.readLine())!=null){
+                TextView tv = new TextView(MainActivity.this);
+                tv.setLayoutParams(params1);
+                tv.setText(mline);
                 linearLayout.addView(tv);
             }
-        }
-        catch (IOException e) {
-            Log.d("creation","shit went wrong");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(reader!=null){
+                reader.close();
+            }
         }
     }
 }
